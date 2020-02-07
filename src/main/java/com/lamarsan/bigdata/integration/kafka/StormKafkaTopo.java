@@ -1,8 +1,13 @@
 package com.lamarsan.bigdata.integration.kafka;
 
 import com.google.common.collect.Maps;
+import com.lamarsan.bigdata.demo.ClusterSumStormTopology;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
+import org.apache.storm.StormSubmitter;
+import org.apache.storm.generated.AlreadyAliveException;
+import org.apache.storm.generated.AuthorizationException;
+import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.jdbc.bolt.JdbcInsertBolt;
 import org.apache.storm.jdbc.common.ConnectionProvider;
 import org.apache.storm.jdbc.common.HikariCPConnectionProvider;
@@ -57,7 +62,19 @@ public class StormKafkaTopo {
 
         builder.setBolt("JdbcInsertBolt", userPersistanceBolt).shuffleGrouping(BOLD_ID);
 
-        LocalCluster cluster = new LocalCluster();
-        cluster.submitTopology(StormKafkaTopo.class.getSimpleName(), new Config(), builder.createTopology());
+        // 提交到storm集群
+        String topoName = StormKafkaTopo.class.getSimpleName();
+        try {
+            StormSubmitter.submitTopology(topoName, new Config(), builder.createTopology());
+        } catch (AlreadyAliveException e) {
+            e.printStackTrace();
+        } catch (InvalidTopologyException e) {
+            e.printStackTrace();
+        } catch (AuthorizationException e) {
+            e.printStackTrace();
+        }
+        // 本地运行
+        //LocalCluster cluster = new LocalCluster();
+        //cluster.submitTopology(StormKafkaTopo.class.getSimpleName(), new Config(), builder.createTopology());
     }
 }

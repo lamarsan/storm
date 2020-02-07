@@ -37,7 +37,7 @@ public class LogProcessBolt extends BaseRichBolt {
             String longitude = splits[1];
             String latitude = splits[2];
             long time = DateUtils.getInstance().getTime(splits[3]);
-            collector.emit(new Values(time, Double.parseDouble(longitude), Double.parseDouble(latitude)));
+            collector.emit(new Values(imsi, time, Double.parseDouble(longitude), Double.parseDouble(latitude)));
             System.out.println(imsi + "," + longitude + "," + latitude + "," + time);
             this.collector.ack(input);
         } catch (Exception e) {
@@ -47,6 +47,6 @@ public class LogProcessBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("time", "longitude", "latitude"));
+        declarer.declare(new Fields("imsi", "time", "longitude", "latitude"));
     }
 }
